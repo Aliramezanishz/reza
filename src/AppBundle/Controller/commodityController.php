@@ -89,7 +89,7 @@ class commodityController extends Controller {
      */
     public function editAction(Request $request, commodity $commodity) {
         $deleteForm = $this->createDeleteForm($commodity);
-        $editForm = $this->createForm('AppBundle\Form\commodityType', $commodity);
+        $editForm = $this->createForm('AppBundle\Form\commodityType');
         $editForm->handleRequest($request);
 
         if ($editForm->isSubmitted() && $editForm->isValid()) {
