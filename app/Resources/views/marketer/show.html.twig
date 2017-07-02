@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Marketer</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ marketer.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ marketer.name }}</td>
+            </tr>
+            <tr>
+                <th>Family</th>
+                <td>{{ marketer.family }}</td>
+            </tr>
+            <tr>
+                <th>Address</th>
+                <td>{{ marketer.address }}</td>
+            </tr>
+            <tr>
+                <th>Tel</th>
+                <td>{{ marketer.tel }}</td>
+            </tr>
+            <tr>
+                <th>Nc</th>
+                <td>{{ marketer.nc }}</td>
+            </tr>
+            <tr>
+                <th>Presenter</th>
+                <td>{{ marketer.presenter }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ marketer.email }}</td>
+            </tr>
+            <tr>
+                <th>Pass</th>
+                <td>{{ marketer.pass }}</td>
+            </tr>
+            <tr>
+                <th>Role</th>
+                <td>{{ marketer.role }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('marketer_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('marketer_edit', { 'id': marketer.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Commodities list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Count</th>
+                <th>Fie</th>
+                <th>Barcode</th>
+                <th>Pic</th>
+                <th>Buy</th>
+                <th>Sale</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for commodity in commodities %}
+            <tr>
+                <td><a href="{{ path('commodity_show', { 'id': commodity.id }) }}">{{ commodity.id }}</a></td>
+                <td>{{ commodity.name }}</td>
+                <td>{{ commodity.count }}</td>
+                <td>{{ commodity.fie }}</td>
+                <td>{{ commodity.barcode }}</td>
+                <td>{{ commodity.pic }}</td>
+                <td>{{ commodity.buy }}</td>
+                <td>{{ commodity.sale }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('commodity_show', { 'id': commodity.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('commodity_edit', { 'id': commodity.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('commodity_new') }}">Create a new commodity</a>
+        </li>
+    </ul>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Marketers list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Family</th>
+                <th>Address</th>
+                <th>Tel</th>
+                <th>Nc</th>
+                <th>Presenter</th>
+                <th>Email</th>
+                <th>Pass</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for marketer in marketers %}
+            <tr>
+                <td><a href="{{ path('marketer_show', { 'id': marketer.id }) }}">{{ marketer.id }}</a></td>
+                <td>{{ marketer.name }}</td>
+                <td>{{ marketer.family }}</td>
+                <td>{{ marketer.address }}</td>
+                <td>{{ marketer.tel }}</td>
+                <td>{{ marketer.nc }}</td>
+                <td>{{ marketer.presenter }}</td>
+                <td>{{ marketer.email }}</td>
+                <td>{{ marketer.pass }}</td>
+                <td>{{ marketer.role }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('marketer_show', { 'id': marketer.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('marketer_edit', { 'id': marketer.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('marketer_new') }}">Create a new marketer</a>
+        </li>
+    </ul>
+{% endblock %}

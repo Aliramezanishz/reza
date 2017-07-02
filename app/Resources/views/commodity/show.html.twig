@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Commodity</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ commodity.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ commodity.name }}</td>
+            </tr>
+            <tr>
+                <th>Count</th>
+                <td>{{ commodity.count }}</td>
+            </tr>
+            <tr>
+                <th>Fie</th>
+                <td>{{ commodity.fie }}</td>
+            </tr>
+            <tr>
+                <th>Barcode</th>
+                <td>{{ commodity.barcode }}</td>
+            </tr>
+            <tr>
+                <th>Pic</th>
+                <td>{{ commodity.pic }}</td>
+            </tr>
+            <tr>
+                <th>Buy</th>
+                <td>{{ commodity.buy }}</td>
+            </tr>
+            <tr>
+                <th>Sale</th>
+                <td>{{ commodity.sale }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('commodity_index') }}">Back to the list</a>
+        </li>
+        <li>
+            <a href="{{ path('commodity_edit', { 'id': commodity.id }) }}">Edit</a>
+        </li>
+        <li>
+            {{ form_start(delete_form) }}
+                <input type="submit" value="Delete">
+            {{ form_end(delete_form) }}
+        </li>
+    </ul>
+{% endblock %}
