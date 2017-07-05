@@ -14,55 +14,54 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @Route("marketer")
  */
-class MarketerController extends Controller
-{
+class MarketerController extends Controller {
+
     /**
      * Lists all marketer entities.
      *
      * @Route("/", name="marketer_index")
      * @Method("GET")
      */
-    public function indexAction()
-    {
+    public function indexAction() {
         $em = $this->getDoctrine()->getManager();
 
         $marketers = $em->getRepository('AppBundle:Marketer')->findAll();
         $serializer = $this->container->get('jms_serializer');
         $data = $serializer->serialize($marketers, 'json');
-       
+
 
         return new Response($data);
-        
     }
 
     /**
      * Creates a new marketer entity.
      *
-     * @Route("/new", name="marketer_new")
+     * @Route("/new/{name}/{family}/{address}/{tel}/{nc}/{email}/{pass}/{presenter}/{adminid}", name="marketer_new")
      * @Method({"GET", "POST"})
      */
-    public function newAction(Request $request)
-    {
+    public function newAction($name, $family, $address, $tel, $nc, $email, $pass, $presenter, $adminid) {
         $marketer = new Marketer();
-        $form = $this->createForm('AppBundle\Form\MarketerType', $marketer);
-        $form->handleRequest($request);
+        $em = $this->getDoctrine()->getManager();
+        $admin = $em->getRepository('AppBundle:Admin')->findOneBy(
+                array('id' => $adminid));
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $marketer->setRole('ROLE_USER');
-            $em->persist($marketer);
-            $em->flush();
-            $marketer->setMassage('success');
-            $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize($marketer, 'json');
 
-            return new Response($data);
-        }
-
-        return $this->render('marketer/new.html.twig', array(
-            'marketer' => $marketer,
-            'form' => $form->createView(),
-        ));
+        $marketer->setName($name);
+        $marketer->setEmail($email);
+        $marketer->setAddress($address);
+        $marketer->setFamily($family);
+        $marketer->setPass($pass);
+        $marketer->setTel($tel);
+        $marketer->setNc($nc);
+        $marketer->setAdmin($admin);
+        $marketer->setPresenter($presenter);
+        $marketer->setRole('ROLE_USER');
+        $em->persist($marketer);
+        $em->flush();
+        $marketer->setMassage('success');
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize($marketer, 'json');
+        return new Response($data);
     }
 
     /**
@@ -71,41 +70,45 @@ class MarketerController extends Controller
      * @Route("/{id}", name="marketer_show")
      * @Method("GET")
      */
-    public function showAction(Marketer $marketer)
-    {
-        $deleteForm = $this->createDeleteForm($marketer);
-
-        return $this->render('marketer/show.html.twig', array(
-            'marketer' => $marketer,
-            'delete_form' => $deleteForm->createView(),
-        ));
+    public function showAction($id) {
+      $em = $this->getDoctrine()->getManager();
+        $marketer = $em->getRepository('AppBundle:Marketer')->findOneBy(
+                array('id' => $id));
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize($marketer, 'json');
+        return new Response($data);
     }
 
     /**
      * Displays a form to edit an existing marketer entity.
      *
-     * @Route("/{id}/edit", name="marketer_edit")
+     * @Route("/edit/{id}/{name}/{family}/{address}/{tel}/{nc}/{email}/{pass}/{adminid}/{presenter}", name="marketer_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, Marketer $marketer)
-    {
-        $deleteForm = $this->createDeleteForm($marketer);
-        $editForm = $this->createForm('AppBundle\Form\MarketerType', $marketer);
-        $editForm->handleRequest($request);
+   public function editAction($id, $name, $family, $address, $tel, $nc, $email, $pass,$presenter,$adminid) {
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-               $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize('TRUE', 'json');
-            
+        $em = $this->getDoctrine()->getManager();
+        $admin = $em->getRepository('AppBundle:Admin')->findOneBy(
+                array('id' => $adminid));
+        $marketer = $em->getRepository('AppBundle:Marketer')->findOneBy(
+                array('id' => $id));
+
+        $marketer->setName($name);
+        $marketer->setEmail($email);
+        $marketer->setAddress($address);
+        $marketer->setFamily($family);
+        $marketer->setPass($pass);
+        $marketer->setTel($tel);
+        $marketer->setNc($nc);
+         $marketer->setAdmin($admin);
+        $marketer->setPresenter($presenter);
+        $em->persist($marketer);
+        $em->flush();
+       
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize('TRUE', 'json');
+
         return new Response($data);
-        }
-
-        return $this->render('marketer/edit.html.twig', array(
-            'marketer' => $marketer,
-            'edit_form' => $editForm->createView(),
-            'delete_form' => $deleteForm->createView(),
-        ));
     }
 
     /**
@@ -114,8 +117,7 @@ class MarketerController extends Controller
      * @Route("/{id}", name="marketer_delete")
      * @Method("DELETE")
      */
-    public function deleteAction(Request $request, Marketer $marketer)
-    {
+    public function deleteAction(Request $request, Marketer $marketer) {
         $form = $this->createDeleteForm($marketer);
         $form->handleRequest($request);
 
@@ -123,11 +125,11 @@ class MarketerController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->remove($marketer);
             $em->flush();
-             $serializer = $this->container->get('jms_serializer');
+            $serializer = $this->container->get('jms_serializer');
             $data = $serializer->serialize('TRUE', 'json');
         }
 
-       return new Response($data);
+        return new Response($data);
     }
 
     /**
@@ -137,40 +139,36 @@ class MarketerController extends Controller
      *
      * @return \Symfony\Component\Form\Form The form
      */
-    private function createDeleteForm(Marketer $marketer)
-    {
+    private function createDeleteForm(Marketer $marketer) {
         return $this->createFormBuilder()
-            ->setAction($this->generateUrl('marketer_delete', array('id' => $marketer->getId())))
-            ->setMethod('DELETE')
-            ->getForm()
+                        ->setAction($this->generateUrl('marketer_delete', array('id' => $marketer->getId())))
+                        ->setMethod('DELETE')
+                        ->getForm()
         ;
     }
-    
-      /**
+
+    /**
      * Displays a form to edit an existing marketer entity.
      *
      * @Route("/{email}/{pass}/login", name="marketer_login")
      * @Method({"GET", "POST"})
      */
-    public function loginAction($email,$pass) {
+    public function loginAction($email, $pass) {
         $em = $this->getDoctrine()->getManager();
-               $marketer = $em->getRepository('AppBundle:Marketer')->findOneBy(
-    array('email' => $email, 'pass' => $pass));
+        $marketer = $em->getRepository('AppBundle:Marketer')->findOneBy(
+                array('email' => $email, 'pass' => $pass));
 
 
 //////////////////////////////////////////
-      
-        if($marketer){
+
+        if ($marketer) {
             $serializer = $this->container->get('jms_serializer');
             $entity = $serializer->serialize($marketer, 'json');
-  
-        }
-        else{
-         $serializer = $this->container->get('jms_serializer');
+        } else {
+            $serializer = $this->container->get('jms_serializer');
             $entity = $serializer->serialize('FALSE', 'json');
-       
         }
-         return new Response($entity);
+        return new Response($entity);
     }
-    
+
 }

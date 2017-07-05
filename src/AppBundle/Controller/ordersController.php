@@ -36,28 +36,33 @@ class ordersController extends Controller {
     /**
      * Creates a new order entity.
      *
-     * @Route("/new", name="orders_new")
+     * @Route("/new/{customerid}/{marketerid}/{commodityid}/{count}", name="orders_new")
      * @Method({"GET", "POST"})
      */
-    public function newAction(Request $request) {
+    public function newAction($customerid, $marketerid, $commodityid, $count) {
         $order = new orders();
-        $form = $this->createForm('AppBundle\Form\ordersType', $order);
-        $form->handleRequest($request);
+        $em = $this->getDoctrine()->getManager();
+        ////////////////////////relation other entity/////////////////
+        $commodity = $em->getRepository('AppBundle:commodity')->findOneBy(
+                array('id' => $commodityid));
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($order);
-            $em->flush();
-            $order->setMassage('Success');
-            $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize($order, 'json');
-            return new Response($data);
-        }
+        $customer = $em->getRepository('AppBundle:Customer')->findOneBy(
+                array('id' => $customerid));
 
-        return $this->render('orders/new.html.twig', array(
-                    'order' => $order,
-                    'form' => $form->createView(),
-        ));
+        $marketer = $em->getRepository('AppBundle:Marketer')->findOneBy(
+                array('id' => $marketerid));
+
+        //////////////////////////////////////////////////////////////  
+        $order->setCustomer($customer);
+        $order->setMarketer($marketer);
+        $order->setCommodity($commodity);
+        $order->setCount($count);
+        $em->persist($order);
+        $em->flush();
+        $order->setMassage('Success');
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize($order, 'json');
+        return new Response($data);
     }
 
     /**
@@ -66,40 +71,46 @@ class ordersController extends Controller {
      * @Route("/{id}", name="orders_show")
      * @Method("GET")
      */
-    public function showAction(orders $order) {
-        $deleteForm = $this->createDeleteForm($order);
-
-        return $this->render('orders/show.html.twig', array(
-                    'order' => $order,
-                    'delete_form' => $deleteForm->createView(),
-        ));
+    public function showAction($id) {
+        $em = $this->getDoctrine()->getManager();
+        $order = $em->getRepository('AppBundle:orders')->findOneBy(
+                array('id' => $id));
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize($order, 'json');
+        return new Response($data);
     }
 
     /**
      * Displays a form to edit an existing order entity.
      *
-     * @Route("/{id}/edit", name="orders_edit")
+     * @Route("/edit/{id}/{customerid}/{marketerid}/{commodityid}/{count}", name="orders_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, orders $order) {
-        $deleteForm = $this->createDeleteForm($order);
-        $editForm = $this->createForm('AppBundle\Form\ordersType', $order);
-        $editForm->handleRequest($request);
+    public function editAction($id, $customerid, $marketerid, $commodityid, $count) {
+        $em = $this->getDoctrine()->getManager();
+        $order = $em->getRepository('AppBundle:orders')->findOneBy(
+                array('id' => $id));
+        ////////////////////////relation other entity/////////////////
+        $commodity = $em->getRepository('AppBundle:commodity')->findOneBy(
+                array('id' => $commodityid));
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+        $customer = $em->getRepository('AppBundle:Customer')->findOneBy(
+                array('id' => $customerid));
 
-            $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize('TRUE', 'json');
+        $marketer = $em->getRepository('AppBundle:Marketer')->findOneBy(
+                array('id' => $marketerid));
 
-            return new Response($data);
-        }
+        //////////////////////////////////////////////////////////////  
+        $order->setCustomer($customer);
+        $order->setMarketer($marketer);
+        $order->setCommodity($commodity);
+        $order->setCount($count);
+        $em->persist($order);
+        $em->flush();
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize('TRUE', 'json');
 
-        return $this->render('orders/edit.html.twig', array(
-                    'order' => $order,
-                    'edit_form' => $editForm->createView(),
-                    'delete_form' => $deleteForm->createView(),
-        ));
+        return new Response($data);
     }
 
     /**
@@ -116,7 +127,7 @@ class ordersController extends Controller {
             $em = $this->getDoctrine()->getManager();
             $em->remove($order);
             $em->flush();
-             $serializer = $this->container->get('jms_serializer');
+            $serializer = $this->container->get('jms_serializer');
             $data = $serializer->serialize('TRUE', 'json');
 
             return new Response($data);

@@ -37,32 +37,31 @@ class commodityController extends Controller {
     /**
      * Creates a new commodity entity.
      *
-     * @Route("/new", name="commodity_new")
+     * @Route("/new/{name}/{barcode}/{buy}/{sale}/{fie}/{count}/{pic}/{adminid}", name="commodity_new")
      * @Method({"GET", "POST"})
      */
-    public function newAction(Request $request) {
-        $commodity = new Commodity();
-        $form = $this->createForm('AppBundle\Form\commodityType', $commodity);
-        $form->handleRequest($request);
+    public function newAction($name,$barcode,$buy,$sale,$pic,$count,$fie,$adminid) {
+          $commodity = new commodity();
+        $em = $this->getDoctrine()->getManager();
+        $admin = $em->getRepository('AppBundle:Admin')->findOneBy(
+                array('id' => $adminid));
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $this->upload($commodity);
 
-            $em->persist($commodity);
-            $em->flush();
-            $commodity->setMassage('sucsecc');
-
-            $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize($commodity, 'json');
-
-            return new Response($data);
-        }
-
-        return $this->render('commodity/new.html.twig', array(
-                    'commodity' => $commodity,
-                    'form' => $form->createView(),
-        ));
+        $commodity->setName($name);
+        $commodity->setBarcode($barcode);
+        $commodity->setBuy($buy);
+        $commodity->setSale($sale);
+        $commodity->setPic($pic);
+        $commodity->setCount($count);
+        $commodity->setFie($fie);
+        $commodity->setAdmin($admin);
+                
+        $em->persist($commodity);
+        $em->flush();
+        $commodity->setMassage('success');
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize($commodity, 'json');
+        return new Response($data);
     }
 
     /**
@@ -71,40 +70,45 @@ class commodityController extends Controller {
      * @Route("/{id}", name="commodity_show")
      * @Method("GET")
      */
-    public function showAction(commodity $commodity) {
-        $deleteForm = $this->createDeleteForm($commodity);
-
-
-        return $this->render('commodity/show.html.twig', array(
-                    'commodity' => $commodity,
-                    'delete_form' => $deleteForm->createView(),
-        ));
+    public function showAction($id) {
+  $em = $this->getDoctrine()->getManager();
+        $commodity = $em->getRepository('AppBundle:commodity')->findOneBy(
+                array('id' => $id));
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize($commodity, 'json');
+        return new Response($data);
     }
 
     /**
      * Displays a form to edit an existing commodity entity.
      *
-     * @Route("/{id}/edit", name="commodity_edit")
+     * @Route("/edit/{id}/{name}/{barcode}/{buy}/{sale}/{fie}/{count}/{pic}/{adminid}", name="commodity_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, commodity $commodity) {
-        $deleteForm = $this->createDeleteForm($commodity);
-        $editForm = $this->createForm('AppBundle\Form\commodityType');
-        $editForm->handleRequest($request);
+    public function editAction($id,$name,$barcode,$buy,$sale,$pic,$count,$fie,$adminid) {
+        
+        $em = $this->getDoctrine()->getManager();
+        $commodity = $em->getRepository('AppBundle:commodity')->findOneBy(
+                array('id' => $id));
+        $admin = $em->getRepository('AppBundle:Admin')->findOneBy(
+                array('id' => $adminid));
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-            $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize('TRUE', 'json');
 
-            return new Response($data);
-        }
+        $commodity->setName($name);
+        $commodity->setBarcode($barcode);
+        $commodity->setBuy($buy);
+        $commodity->setSale($sale);
+        $commodity->setPic($pic);
+        $commodity->setCount($count);
+        $commodity->setFie($fie);
+        $commodity->setAdmin($admin);
+                
+        $em->persist($commodity);
+        $em->flush();
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize('TRUE', 'json');
 
-        return $this->render('commodity/edit.html.twig', array(
-                    'commodity' => $commodity,
-                    'edit_form' => $editForm->createView(),
-                    'delete_form' => $deleteForm->createView(),
-        ));
+        return new Response($data);
     }
 
     /**

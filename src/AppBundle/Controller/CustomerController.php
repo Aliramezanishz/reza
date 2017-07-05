@@ -35,29 +35,29 @@ class CustomerController extends Controller {
     /**
      * Creates a new customer entity.
      *
-     * @Route("/new", name="customer_new")
+     * @Route("/new/{name}/{family}/{address}/{tel}/{location}/{subscribe}", name="customer_new")
      * @Method({"GET", "POST"})
      */
-    public function newAction(Request $request) {
+      public function newAction($name, $family, $address, $tel, $location, $subscribe) {
         $customer = new Customer();
-        $form = $this->createForm('AppBundle\Form\CustomerType', $customer);
-        $form->handleRequest($request);
+        $em = $this->getDoctrine()->getManager();
+      
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($customer);
-            $em->flush();
-            $customer->setMassage('Success');
-            $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize($customer, 'json');
 
-            return new Response($data);
-        }
-
-        return $this->render('customer/new.html.twig', array(
-                    'customer' => $customer,
-                    'form' => $form->createView(),
-        ));
+        $customer->setName($name);
+        $customer->setFamily($family);
+        $customer->setAddress($address);
+        $customer->setTel($tel);
+        $customer->setLocation($location);
+        $customer->setSubscribe($subscribe);
+        
+      
+        $em->persist($customer);
+        $em->flush();
+        $customer->setMassage('success');
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize($customer, 'json');
+        return new Response($data);
     }
 
     /**
@@ -66,42 +66,42 @@ class CustomerController extends Controller {
      * @Route("/{id}", name="customer_show")
      * @Method("GET")
      */
-    public function showAction(Customer $customer) {
-        $deleteForm = $this->createDeleteForm($customer);
+    public function showAction($id) {
+       $em = $this->getDoctrine()->getManager();
+        $customer = $em->getRepository('AppBundle:Customer')->findOneBy(
+                array('id' => $id));
         $serializer = $this->container->get('jms_serializer');
         $data = $serializer->serialize($customer, 'json');
-        return $this->render('customer/show.html.twig', array(
-                    'customer' => $customer,
-                    'delete_form' => $deleteForm->createView(),
-        ));
+        return new Response($data);
     }
 
     /**
      * Displays a form to edit an existing customer entity.
      *
-     * @Route("/{id}/edit", name="customer_edit")
+     * @Route("/edit/{id}/{name}/{family}/{address}/{tel}/{location}/{subscribe}", name="customer_edit")
      * @Method({"GET", "POST"})
      */
-    public function editAction(Request $request, Customer $customer) {
-        $deleteForm = $this->createDeleteForm($customer);
-        $editForm = $this->createForm('AppBundle\Form\CustomerType', $customer);
-        $editForm->handleRequest($request);
+    public function editAction($id, $name, $family, $address, $tel, $location, $subscribe) {
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-            $serializer = $this->container->get('jms_serializer');
-            $data = $serializer->serialize('TRUE', 'json');
+        $em = $this->getDoctrine()->getManager();
+        
+        $customer = $em->getRepository('AppBundle:Customer')->findOneBy(
+                array('id' => $id));
 
-            return new Response($data);
-        }
+        $customer->setName($name);
+        $customer->setFamily($family);
+        $customer->setAddress($address);
+        $customer->setTel($tel);
+        $customer->setLocation($location);
+        $customer->setSubscribe($subscribe);
+        $em->persist($customer);
+        $em->flush();
+       
+        $serializer = $this->container->get('jms_serializer');
+        $data = $serializer->serialize('TRUE', 'json');
 
-        return $this->render('customer/edit.html.twig', array(
-                    'customer' => $customer,
-                    'edit_form' => $editForm->createView(),
-                    'delete_form' => $deleteForm->createView(),
-        ));
+        return new Response($data);
     }
-
     /**
      * Deletes a customer entity.
      *

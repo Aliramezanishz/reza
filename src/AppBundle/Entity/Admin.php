@@ -94,7 +94,38 @@ class Admin {
      * @JMS\Expose
      */
     private $massage;
+    
+     /**
+     * @var string
+     * 
+     * @ORM\Column(name="del", type="string", length=255)
+     */
+    private $del;
 
+    /**
+     * Set del
+     *
+     * @param string $del
+     *
+     * @return Admin
+     */
+    public function setDel($del) {
+        $this->del = $del;
+
+        return $this;
+    }
+
+    /**
+     * Get del
+     *
+     * @return string
+     */
+    public function getDel() {
+        return $this->del;
+    }
+
+    
+    
     /**
      * Get id
      *
